@@ -1,6 +1,8 @@
 import React from 'react';
+// @ts-ignore
 import { Form, Input, Button, Checkbox } from 'antd';
-import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+// @ts-ignore
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 
 const LoginPage = () => {
@@ -38,7 +40,6 @@ const LoginPage = () => {
           <Input.Password
             prefix={<LockOutlined />}
             placeholder="Password"
-            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
             className="login-input"
           />
         </Form.Item>
