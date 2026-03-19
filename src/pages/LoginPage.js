@@ -1,50 +1,60 @@
 import React from 'react';
-// @ts-ignore
-import { Button, Checkbox, Form, Input } from 'antd';
-// @ts-ignore
-import { UserOutlined ,LockOutlined} from '@ant-design/icons';
-const onFinish = values => {
-  console.log('Success:', values);
+import { Form, Input, Button, Checkbox } from 'antd';
+import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+
+
+const LoginPage = () => {
+  const onFinish = (values) => {
+    console.log('Success:', values);
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
+  return (
+    <div className="login-container">
+      <Form
+        name="login"
+        className="login-form"
+        initialValues={{ remember: true }}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+        autoComplete="off"
+      >
+        <h2 className="login-title">Employee Login</h2>
+
+        <Form.Item
+          name="username"
+          rules={[{ required: true, message: 'Please input your username!' }]}
+        >
+          <Input prefix={<UserOutlined />} placeholder="Username" className="login-input" />
+        </Form.Item>
+
+        <Form.Item
+          name="password"
+          rules={[{ required: true, message: 'Please input your password!' }]}
+        >
+          <Input.Password
+            prefix={<LockOutlined />}
+            placeholder="Password"
+            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+            className="login-input"
+          />
+        </Form.Item>
+
+        <Form.Item name="remember" valuePropName="checked">
+          <Checkbox className="login-remember">Remember me</Checkbox>
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" className="login-submit">
+            Login
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
+  );
 };
-const onFinishFailed = errorInfo => {
-  console.log('Failed:', errorInfo);
-};
-const LoginPage = () => (
-  <Form
-    name="basic"
-    labelCol={{ span: 8 }}
-    wrapperCol={{ span: 16 }}
-    style={{ maxWidth: 600 }}
-    initialValues={{ remember: true }}
-    onFinish={onFinish}
-    onFinishFailed={onFinishFailed}
-    autoComplete="off"
-  >
-    <Form.Item
-      label="Username"
-      name="username"
-      rules={[{ required: true, message: 'Please input your username!' }]}
-    >
-      <Input prefix={<UserOutlined />} />
-    </Form.Item>
 
-    <Form.Item
-      label="Password"
-      name="password"
-      rules={[{ required: true, message: 'Please input your password!' }]}
-    >
-      <Input.Password prefix={<LockOutlined />} />
-    </Form.Item>
-
-    <Form.Item name="remember" valuePropName="checked" label={null}>
-      <Checkbox>Remember me</Checkbox>
-    </Form.Item>
-
-    <Form.Item label={null}>
-      <Button type="primary" htmlType="submit">
-        Submit
-      </Button>
-    </Form.Item>
-  </Form>
-);
 export default LoginPage;
