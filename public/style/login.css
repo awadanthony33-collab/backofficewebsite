@@ -3,7 +3,7 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-image: url('../logo.png'), linear-gradient(to right, #ec0707, #bb5757);
+    background-image: linear-gradient(to right, #a4091b , rgb(161, 41, 55) );
     background-size: contain, cover;  
     background-repeat: no-repeat, no-repeat;
     background-position: left;
@@ -32,7 +32,7 @@
 
 .login-title {
   margin-bottom: 20px;
-  color: #ec0707;
+  color: #a4091b;
   font-size: 24px;
   font-weight: bold;
 }
