@@ -6,13 +6,37 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 
 const LoginPage = () => {
-  const onFinish = (values) => {
-    console.log('Success:', values);
-  };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
+
+  const onFinish = async (values) =>{
+    const payload = {
+      users: values.username,
+      password : values.password
+    };
+    try {
+      const responce  = await fetch('http://localhost:54608/api/LogUsers/login', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if(responce.ok)
+      {
+        const data =await responce.json();
+        console.log('LOGIN SUCCESS',data);
+      }
+      else
+      {
+        console.log('LOGIN FAILED');
+      }
+    }
+      catch(error)
+      {
+        console.error("ERROR",error);
+      }
+  }
 
   return (
     <div className="login-container">
@@ -21,7 +45,6 @@ const LoginPage = () => {
         className="login-form"
         initialValues={{ remember: true }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
         <h2 className="login-title">Employee Login</h2>
