@@ -4,7 +4,7 @@ import './App.css';
 import LoginPage from './pages/LoginPage';
 
 import ProtectRoute from './protecter/ProtectRoute';
-import Mainpage from './pages/mainpage';
+import PageLayout from './navpage/pagelayout';
 
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           
           
-          <Route path="/mainpage" element={<ProtectRoute><Mainpage /></ProtectRoute>} />
+          <Route path="/mainpage" element={<ProtectRoute><PageLayout/></ProtectRoute>} />
           {/* <Route path="/users" element={<ProtectRoute><UsersPage /></ProtectRoute>} />
           <Route path="/customers" element={<ProtectRoute><CustomersPage /></ProtectRoute>} />
           <Route path="/settings" element={<ProtectRoute><CustomersPage /></ProtectRoute>} /> */}
