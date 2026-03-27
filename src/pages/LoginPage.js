@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 // @ts-ignore
 import { Form, Input, Button, Checkbox } from 'antd';
 // @ts-ignore
@@ -6,13 +6,13 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 
 const LoginPage = () => {
-
-
+  const [loading,setloading] = useState(false);
   const onFinish = async (values) =>{
     const payload = {
       users: values.username,
       password : values.password
     };
+    setloading(true);
     try {
       const responce  = await fetch('http://localhost:54608/api/LogUsers/login', {
         method:'POST',
@@ -47,7 +47,7 @@ const LoginPage = () => {
         onFinish={onFinish}
         autoComplete="off"
       >
-        <h2 className="login-title">Employee Login</h2>
+        <h2 className="login-title">backoffice Login</h2>
 
         <Form.Item
           name="username"
@@ -72,7 +72,8 @@ const LoginPage = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" className="login-submit">
+          <Button type="primary" htmlType="submit" className="login-submit" loading={loading}>
+            
             Login
           </Button>
         </Form.Item>
