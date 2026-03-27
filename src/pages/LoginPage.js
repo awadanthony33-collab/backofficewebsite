@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 // @ts-ignore
-import { Form, Input, Button, Checkbox } from 'antd';
+import { useNavigate } from 'react-router-dom';
+// @ts-ignore
+import { Form, Input, Button, Checkbox ,message} from 'antd';
 // @ts-ignore
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 
 const LoginPage = () => {
+  const [form] = Form.useForm();
   const [loading,setloading] = useState(false);
+const navigate = useNavigate();
   const onFinish = async (values) =>{
     const payload = {
       users: values.username,
@@ -26,21 +30,34 @@ const LoginPage = () => {
       {
         const data =await responce.json();
         console.log('LOGIN SUCCESS',data);
+        message.success(`Welcome, ${data.users}!`);
+        setTimeout(() => {
+          navigate('/mainpage')
+        }, 500);
+      }
+      else if(responce.status===401)
+      {
+        message.error('Invalid username or password'); 
       }
       else
       {
-        console.log('LOGIN FAILED');
+        message.error('Login Failed. Please try again');
       }
     }
-      catch(error)
-      {
-        console.error("ERROR",error);
-      }
+    catch(error)
+    {
+        message.error('Network error. Please check your connection');
+    }
+    finally
+    {
+      setloading(false);
+    }
   }
 
   return (
     <div className="login-container">
       <Form
+        form ={form}
         name="login"
         className="login-form"
         initialValues={{ remember: true }}
