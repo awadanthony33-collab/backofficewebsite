@@ -2,75 +2,80 @@ import React, { useState } from 'react';
 // @ts-ignore
 import { useNavigate } from 'react-router-dom';
 // @ts-ignore
-import { Form, Input, Button, Checkbox ,message} from 'antd';
+import { Form, Input, Button, Checkbox, message } from 'antd';
 // @ts-ignore
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
-
 const LoginPage = () => {
   const [form] = Form.useForm();
-  const [loading,setloading] = useState(false);
-const navigate = useNavigate();
-  const onFinish = async (values) =>{
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const onFinish = async (values) => {
     const payload = {
       users: values.username,
-      password : values.password
+      password: values.password
     };
-    setloading(true);
+
+    setLoading(true);
+
     try {
-      const responce  = await fetch('http://localhost:54608/api/LogUsers/login', {
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json'
+      const response = await fetch('http://localhost:54608/api/LogUsers/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
       });
 
-      if(responce.ok)
-      {
-        const data =await responce.json();
-        console.log('LOGIN SUCCESS',data);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('LOGIN SUCCESS', data);
+
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('username', data.users);
+
         message.success(`Welcome, ${data.users}!`);
+        
         setTimeout(() => {
-          navigate('/mainpage')
+          navigate('/mainpage');
         }, 500);
+
+      } else if (response.status === 401) {
+        message.error('Invalid username or password.');
+      } else {
+        message.error('Login failed. Please try again.');
       }
-      else if(responce.status===401)
-      {
-        message.error('Invalid username or password'); 
-      }
-      else
-      {
-        message.error('Login Failed. Please try again');
-      }
+    } catch (error) {
+      message.error('Network error. Please check your connection.');
+      console.error('ERROR', error);
+    } finally {
+      setLoading(false);
     }
-    catch(error)
-    {
-        message.error('Network error. Please check your connection');
-    }
-    finally
-    {
-      setloading(false);
-    }
-  }
+  };
 
   return (
     <div className="login-container">
       <Form
-        form ={form}
+        form={form}
         name="login"
         className="login-form"
         initialValues={{ remember: true }}
         onFinish={onFinish}
         autoComplete="off"
       >
-        <h2 className="login-title">backoffice Login</h2>
+        <h2 className="login-title">Backoffice Login</h2>
 
         <Form.Item
           name="username"
           rules={[{ required: true, message: 'Please input your username!' }]}
         >
-          <Input prefix={<UserOutlined />} placeholder="Username" className="login-input" />
+          <Input
+            prefix={<UserOutlined />}
+            placeholder="Username"
+            className="login-input"
+            disabled={loading}
+          />
         </Form.Item>
 
         <Form.Item
@@ -81,6 +86,7 @@ const navigate = useNavigate();
             prefix={<LockOutlined />}
             placeholder="Password"
             className="login-input"
+            disabled={loading}
           />
         </Form.Item>
 
@@ -89,8 +95,13 @@ const navigate = useNavigate();
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" className="login-submit" loading={loading}>
-            
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="login-submit"
+            loading={loading}
+            block
+          >
             Login
           </Button>
         </Form.Item>
