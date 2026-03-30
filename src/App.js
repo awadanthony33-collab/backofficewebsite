@@ -1,11 +1,18 @@
-import { ConfigProvider } from '../node_modules/antd/es/index';
+// @ts-ignore
+import { ConfigProvider } from 'antd';
+// @ts-ignore
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-import LoginPage from './pages/LoginPage';
+import LoginPage        from './pages/LoginPage';
+import Navpage          from './pages/navpage';
+import ProtectRoute     from './protecter/ProtectRoute';
 
-import ProtectRoute from './protecter/ProtectRoute';
-import PageLayout from './navpage/pagelayout';
+// ── Page imports ──────────────────────────────────────────────────────────────
 
+import DoctorsPage      from './pages/DoctorsPage';
+import AlertesPage      from './pages/AlertesPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
+import RapportPage from './pages/Rapportpage';
 
 function App() {
   return (
@@ -13,22 +20,36 @@ function App() {
       theme={{
         token: {
           colorPrimary: '#a4091b',
+          borderRadius: 8,
+          fontFamily: "'DM Sans', sans-serif",
         },
       }}
     >
       <Router>
         <Routes>
+          {/* Public */}
           <Route path="/login" element={<LoginPage />} />
-          
-          
-          <Route path="/mainpage" element={<ProtectRoute><PageLayout/></ProtectRoute>} />
-          {/* <Route path="/users" element={<ProtectRoute><UsersPage /></ProtectRoute>} />
-          <Route path="/customers" element={<ProtectRoute><CustomersPage /></ProtectRoute>} />
-          <Route path="/settings" element={<ProtectRoute><CustomersPage /></ProtectRoute>} /> */}
 
+          <Route
+            path="/mainpage"
+            element={
+              <ProtectRoute>
+                <Navpage />
+              </ProtectRoute>
+            }
+          >
 
+            <Route index element={<Navigate to="rapport" replace />} />
+            <Route path="rapport"         element={<RapportPage />} />
+            <Route path="doctors"         element={<DoctorsPage />} />
+            <Route path="alertes"         element={<AlertesPage />} />
+            <Route path="change-password" element={<ChangePasswordPage />} />
+          </Route>
+
+          {/* Fallbacks */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
+
         </Routes>
       </Router>
     </ConfigProvider>
