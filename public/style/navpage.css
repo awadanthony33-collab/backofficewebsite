@@ -1,0 +1,110 @@
+/* ── Layout ── */
+.nav-layout {
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.nav-sider {
+  position: fixed !important;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+
+/* ── Brand ── */
+.nav-brand {
+  padding: 0 16px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+.nav-brand-text {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.nav-brand-icon {
+  color: #a4091b;
+  font-size: 20px;
+}
+
+.nav-collapse-btn {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 14px 20px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.nav-collapse-label {
+  margin-left: 10px;
+}
+
+/* ── Main area ── */
+.nav-main {
+  margin-left: 240px;
+  transition: margin-left 0.2s ease;
+}
+
+.nav-main.collapsed {
+  margin-left: 72px; /* collapsed sidebar width */
+}
+/* ── Header ── */
+.nav-header {
+  background: #ffffff !important;
+  padding: 0 24px !important;
+  border-bottom: 1px solid #e8e8e8;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-header-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #a4091b;
+}
+.nav-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+    transition: margin-left 0.2s ease;
+}
+
+.nav-logo {
+  height: 88px; 
+  width: auto;
+  object-fit: contain;
+}
+
+.nav-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 10px;
+  transition: all 0.2s;
+}
+
+.nav-user-chip:hover {
+  border-color: #a4091b;
+  background: #fff0f0;
+}
+
+.nav-avatar {
+  background: #a4091b !important;
+}
+
+/* ── Content ── */
+.nav-content {
+  padding: 24px;
+  background: #f4f5f7;
+  min-height: calc(100vh - 64px);
+}

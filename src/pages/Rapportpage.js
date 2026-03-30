@@ -1,11 +1,11 @@
 import React from 'react';
 
-const Rapportpage = () => {
-    return (
-        <div>
-            
-        </div>
-    );
-}
+const RapportPage = () => {
+  return (
+    <div>
+      <h2>Rapports</h2>
+    </div>
+  );
+};
 
-export default Rapportpage;
+export default RapportPage;

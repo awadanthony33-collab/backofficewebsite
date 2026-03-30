@@ -27,7 +27,6 @@ function App() {
     >
       <Router>
         <Routes>
-          {/* Public */}
           <Route path="/login" element={<LoginPage />} />
 
           <Route
@@ -43,10 +42,9 @@ function App() {
             <Route path="rapport"         element={<RapportPage />} />
             <Route path="doctors"         element={<DoctorsPage />} />
             <Route path="alertes"         element={<AlertesPage />} />
-            <Route path="change-password" element={<ChangePasswordPage />} />
+            <Route path="changepassword" element={<ChangePasswordPage />} />
           </Route>
 
-          {/* Fallbacks */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
 
