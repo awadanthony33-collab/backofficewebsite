@@ -9,11 +9,12 @@ import ProtectRoute     from './protecter/ProtectRoute';
 
 // ── Page imports ──────────────────────────────────────────────────────────────
 
-import DoctorsPage      from './pages/DoctorsPage';
+import DoctorsPage      from './doctorspage.js/DoctorsPage';
 import AlertesPage      from './pages/AlertesPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import RapportPage from './pages/Rapportpage';
-import DoctorsEditPage from './pages/DoctorsEditPage';
+import DoctorsEditPage from './doctorspage.js/DoctorsEditPage';
+import DoctorAddPage from './doctorspage.js/DoctorAddPage';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
             <Route path="rapport"         element={<RapportPage />} />
             <Route path="doctors"         element={<DoctorsPage />} />
             <Route path="/mainpage/doctors/edit/:id" element={<DoctorsEditPage />} /> 
+            <Route path="/mainpage/doctors/new"        element={<DoctorAddPage />} />
             <Route path="alertes"         element={<AlertesPage />} />
             <Route path="changepassword" element={<ChangePasswordPage />} />
           </Route>
