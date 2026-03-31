@@ -82,6 +82,7 @@
   height: 88px; 
   width: auto;
   object-fit: contain;
+  left:0;
 }
 
 .nav-user-chip {

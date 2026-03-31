@@ -13,6 +13,7 @@ import DoctorsPage      from './pages/DoctorsPage';
 import AlertesPage      from './pages/AlertesPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import RapportPage from './pages/Rapportpage';
+import DoctorsEditPage from './pages/DoctorsEditPage';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
             <Route index element={<Navigate to="rapport" replace />} />
             <Route path="rapport"         element={<RapportPage />} />
             <Route path="doctors"         element={<DoctorsPage />} />
+            <Route path="/mainpage/doctors/edit/:id" element={<DoctorsEditPage />} /> 
             <Route path="alertes"         element={<AlertesPage />} />
             <Route path="changepassword" element={<ChangePasswordPage />} />
           </Route>
