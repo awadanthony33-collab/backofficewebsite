@@ -5,7 +5,7 @@ import { Form, Input, Button, Card, Space, message, Spin } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 // @ts-ignore
 import { SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { getById, update } from '../api/api';
+import { getById, update } from '../../api/api';
 const { TextArea } = Input;
 
 

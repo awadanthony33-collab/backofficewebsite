@@ -13,8 +13,8 @@ import DoctorsPage      from './doctorspage.js/DoctorsPage';
 import AlertesPage      from './pages/AlertesPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import RapportPage from './pages/Rapportpage';
-import DoctorsEditPage from './doctorspage.js/DoctorsEditPage';
-import DoctorAddPage from './doctorspage.js/DoctorAddPage';
+import DoctorsEditPage from './doctorspage.js/CRUD_Doctors/DoctorsEditPage';
+import DoctorAddPage from './doctorspage.js/CRUD_Doctors/DoctorAddPage';
 
 function App() {
   return (

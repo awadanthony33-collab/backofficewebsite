@@ -5,7 +5,7 @@ import { Form, Input, Button, Card, Space, message, Select } from 'antd';
 import { useNavigate } from 'react-router-dom';
 // @ts-ignore
 import { SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { create } from '../api/api';
+import { create } from '../../api/api';
 const { TextArea } = Input;
 
 
