@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // @ts-ignore
-import { Table, Tag, Button, Input, Space, message, Switch, Tabs } from 'antd';  // ← add Tabs
+import { Table, Tag, Button, Input, Space, message, Switch, Tabs } from 'antd';
 // @ts-ignore
 import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 // @ts-ignore
@@ -14,7 +14,7 @@ const DoctorsPage = () => {
   const [loading,    setLoading]    = useState(false);
   const [search,     setSearch]     = useState('');
   const [togglingId, setTogglingId] = useState(null);
-  const [activeTab,  setActiveTab]  = useState('active');   // ← 'active' | 'inactive'
+  const [activeTab,  setActiveTab]  = useState('active');
   const navigate = useNavigate();
 
   const fetchDoctors = async () => {
@@ -75,11 +75,13 @@ const DoctorsPage = () => {
       size="small"
       pagination={{ pageSize: 10 }}
     >
+
       <Column
         title="Nom"
         key="fullname"
-        render={(_, record) => `${record.title || ''} ${record.lastName} ${record.name}`}
+        render={(_, record) => `${record.title || ''} ${record.lastName} ${record.sName} ${record.name} `}
       />
+
 
       <Column
         title="Position"
@@ -100,7 +102,8 @@ const DoctorsPage = () => {
               onChange={() => handleToggleFlag(record)}
               size="small"
             />
-            <Tag color={flag === '1' ? 'green' : 'red'}>
+            <Tag 
+              color={flag === '1' ? 'green' : 'red'}>
               {flag === '1' ? 'ACTIF' : 'INACTIF'}
             </Tag>
           </Space>
@@ -135,14 +138,12 @@ const DoctorsPage = () => {
 
   return (
     <div>
-      {/* ── Toolbar ── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <Input
+      <div className="toolbar">
+        <Input className="search-input"
           placeholder="Rechercher un médecin..."
           prefix={<SearchOutlined />}
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: 260 }}
         />
         <Space>
           <Button
@@ -158,14 +159,13 @@ const DoctorsPage = () => {
         </Space>
       </div>
 
-      {/* ── Tabs ── */}
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
         items={[
           {
             key:      'active',
-            label:    `Actifs (${activeDoctors.length})`,       // ← live count in tab
+            label:    `Actifs (${activeDoctors.length})`,
             children: <DoctorsTable data={activeDoctors} />,
           },
           {

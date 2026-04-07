@@ -9,11 +9,12 @@ import {
   FileTextOutlined,
   MedicineBoxOutlined,
   BellOutlined,
- LogoutOutlined, 
- LockOutlined,
- UserOutlined,
+  LogoutOutlined, 
+  LockOutlined,
+  UserOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  ClockCircleOutlined ,
 // @ts-ignore
 } from '@ant-design/icons';
 import { Avatar, Dropdown } from '../../node_modules/antd/es/index';
@@ -24,6 +25,7 @@ const ROUTES  =
     'doctors' : '/mainpage/doctors',
     'alertes': '/mainpage/alertes',
     'changepassword' : '/mainpage/changepassword',
+    'Duree_de_conservation' : '/mainpage/Duree_de_conservation'
 };
 
 const Navpage = () => {
@@ -59,6 +61,7 @@ const userMenu = {
         { key: 'alertes',         icon: <BellOutlined />,        label: 'Alertes nouvelles'  },
         { type: 'divider' },
         { key: 'changepassword', icon: <LockOutlined />,        label: 'Mot de passe'       },
+        { key: 'Duree_de_conservation', icon: <ClockCircleOutlined  />,        label: 'Durée de conservation'       },
       ];
 return (
     <Layout className="nav-layout">
@@ -82,23 +85,23 @@ return (
 
         </Sider>
 
-<Layout className={`nav-main ${collapsed ? 'collapsed' : ''}`}>
-  <Header className="nav-header">
-    <div className="nav-header-left">
-      <img src="/logo.png" alt="Logo" className="nav-logo" />
-      <span className="nav-header-title">Institut National de Pathologie</span>
-    </div>
-    <Dropdown menu={userMenu} placement="bottomRight" trigger={['click']}>
-      <div className="nav-user-chip">
-        <Avatar icon={<UserOutlined />} className="nav-avatar" />
-        <span className="nav-username">{username}</span>
-      </div>
-    </Dropdown>
-  </Header>
-  <Content className="nav-content">
-    <Outlet />
-  </Content>
-</Layout>
+        <Layout className={`nav-main ${collapsed ? 'collapsed' : ''}`}>
+        <Header className="nav-header">
+          <div className="nav-header-left">
+            <img src="/logo.png" alt="Logo" className="nav-logo" />
+            <span className="nav-header-title">Institut National de Pathologie</span>
+          </div>
+          <Dropdown menu={userMenu} placement="bottomRight" trigger={['click']}>
+            <div className="nav-user-chip">
+              <Avatar icon={<UserOutlined />} className="nav-avatar" />
+              <span className="nav-username">{username}</span>
+            </div>
+          </Dropdown>
+        </Header>
+        <Content className="nav-content">
+          <Outlet />
+        </Content>
+      </Layout>
     </Layout>
 );
 }

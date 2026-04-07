@@ -1,0 +1,11 @@
+.toolbar
+{
+    display: flex;
+    margin-bottom: 16px;
+    justify-content: space-between;
+}
+
+.search-input
+{
+    width: 260px;
+}
