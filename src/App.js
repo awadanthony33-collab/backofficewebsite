@@ -10,7 +10,7 @@ import ProtectRoute     from './protecter/ProtectRoute';
 // ── Page imports ──────────────────────────────────────────────────────────────
 
 import DoctorsPage      from './doctorspage.js/Doctors_Page';
-import AlertesPage      from './pages/AlertesPage';
+import AlertesPage      from './alertepage/AlertesPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import RapportPage from './pages/Rapportpage';
 import DoctorsEditPage from './doctorspage.js/Doctors_CRUD/DoctorsEditPage';
@@ -53,7 +53,6 @@ function App() {
 
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
-
         </Routes>
       </Router>
     </ConfigProvider>

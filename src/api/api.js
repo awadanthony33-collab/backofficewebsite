@@ -5,6 +5,7 @@
 
 const BASE_URL = 'http://localhost:54608/api';
 
+
 // ── Get headers ───────────────────────────────────────────
 const getHeaders = () => ({
   'Content-Type': 'application/json',
@@ -50,7 +51,8 @@ export const update = async (endpoint, id, data) => {
   });
   if (!response.ok) throw new Error(`PUT ${endpoint}/${id} failed`);
 };
-
+export const post = create;   
+export const put = update; 
 // ── DELETE — remove record ────────────────────────────────
 export const remove = async (endpoint, id) => {
   const response = await fetch(`${BASE_URL}/${endpoint}/${id}`, {
