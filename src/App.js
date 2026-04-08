@@ -16,6 +16,7 @@ import RapportPage from './pages/Rapportpage';
 import DoctorsEditPage from './doctorspage.js/Doctors_CRUD/DoctorsEditPage';
 import DoctorAddPage from './doctorspage.js/Doctors_CRUD/DoctorAddPage';
 import Duree_de_conservation from './pages/Duree_de_conservation';
+import AlertesaddEdit from './alertepage/AlertesEdit';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
             <Route path="/mainpage/doctors/edit/:id" element={<DoctorsEditPage />} /> 
             <Route path="/mainpage/doctors/new"        element={<DoctorAddPage />} />
             <Route path="alertes"         element={<AlertesPage />} />
+            <Route path="/mainpage/news/edit/:id" element={<AlertesaddEdit />} />
             <Route path="changepassword" element={<ChangePasswordPage />} />
             <Route path="Duree_de_conservation" element={<Duree_de_conservation/>} />
           </Route>
