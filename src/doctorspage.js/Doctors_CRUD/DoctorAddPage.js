@@ -12,7 +12,7 @@ const { TextArea } = Input;
 const DoctorAddPage = () => {
   const navigate       = useNavigate();
   const [form]         = Form.useForm();
-  const [saving, setSaving] = useState(false);asdasd
+  const [saving, setSaving] = useState(false);
 //save new doctors
   const handleSave = async (values) => {
     setSaving(true);

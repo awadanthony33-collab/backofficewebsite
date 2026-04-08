@@ -1,73 +1,115 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 // @ts-ignore
-import { Flex, Space, Table, Tag } from 'antd';
-const { Column, ColumnGroup } = Table;
+import { Table, Button, Space, message, Tabs } from 'antd';
+// @ts-ignore
+import {  ReloadOutlined } from '@ant-design/icons';
+// @ts-ignore
+import { getAll, remove } from '../api/api';
+const { Column } = Table;
 
 
-const data = [
-  {
-    key: '1',
-    firstName: 'John',
-    lastName: 'Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    firstName: 'Jim',
-    lastName: 'Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['kawaii'],
-  },
-  {
-    key: '3',
-    firstName: 'Joe',
-    lastName: 'Black',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
-const AlertesPage = () => (
-  <Table dataSource={data}>
-    <ColumnGroup title="Name">
-      <Column title="First Name" dataIndex="firstName" key="firstName" />
-      <Column title="Last Name" dataIndex="lastName" key="lastName" />
-    </ColumnGroup>
-    <Column title="Age" dataIndex="age" key="age" />
-    <Column title="Address" dataIndex="address" key="address" />
+const AlertesPage = () => {
+  const [news,    setnews]    = useState([]);
+  const [loading,    setLoading]    = useState(false);
+  const [activeTab,  setActiveTab]  = useState('active');
+
+
+  const fetchnews = async () => {
+    setLoading(true);     
+    try {
+      const data = await getAll('NewsPointers');
+      setnews(data);
+    } catch (error) {
+      message.error('Impossible de charger news.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchnews(); }, []);
+
+  const handleDelete = async (NewsId) => {
+    try {
+      await remove('NewsPointers', NewsId);
+      message.success('Médecin supprimé.');
+      fetchnews();
+    } catch (error) {
+      message.error('Impossible de supprimer.');
+    }
+  };
+
+const activenews = news.filter(n => String(n.NewsActive) === '1');
+const inactivenews = news.filter(n => String(n.NewsActive) !== '1');
+
+const NewsTable = ({ data }) => (
+  <Table
+    dataSource={data}
+    rowKey="NewsId"
+    loading={loading}
+    size="small"
+    pagination={{ pageSize: 10 }}
+  >
+    <Column title="ID" dataIndex="NewsId" key="NewsId" />
+
     <Column
-      title="Tags"
-      dataIndex="tags"
-      key="tags"
-      render={tags => (
-        <Flex gap="small" align="center" wrap>
-          {tags.map(tag => {
-            let color = tag.length > 5 ? 'geekblue' : 'green';
-            if (tag === 'kawaii') {
-              color = 'volcano';
-            }
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </Flex>
-      )}
+      title="Commentaire (FR)"
+      dataIndex="NewsCommentFrench"
+      key="NewsCommentFrench"
     />
+
     <Column
-      title="Action"
-      key="action"
+      title="Commentaire (EN)"
+      dataIndex="NewsCommentEnglish"
+      key="NewsCommentEnglish"
+    />
+
+    <Column
+      title="Actions"
+      key="actions"
       render={(_, record) => (
-        <Space size="medium">
-          <a>Invite {record.lastName}</a>
-          <a>Delete</a>
+        <Space>
+          <Button
+            size="small"
+            type="link"
+            danger
+            onClick={() => handleDelete(record.NewsId)}
+          >
+            Supprimer
+          </Button>
         </Space>
       )}
     />
   </Table>
 );
+
+  return (
+    <div>
+      <div className="toolbar">
+        <Space>
+          <Button icon={<ReloadOutlined />} onClick={fetchnews}>
+            Actualiser
+          </Button>
+        </Space>
+      </div>
+
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={[
+          {
+            key:      'active',
+            label:    `Actifs (${activenews.length})`,
+            children: <NewsTable data={activenews} />,
+          },
+          {
+            key:      'inactive',
+            label:    `Inactifs (${inactivenews.length})`,
+            children: <NewsTable data={inactivenews} />,
+          },
+        ]}
+      />
+    </div>
+  );
+};
+
 export default AlertesPage;
