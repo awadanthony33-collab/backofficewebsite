@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+// @ts-ignore
 import { Input, Button, Space, Card, Typography, message, Popconfirm } from "antd";
 
 const { Title } = Typography;

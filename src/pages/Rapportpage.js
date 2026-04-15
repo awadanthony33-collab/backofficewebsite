@@ -2,7 +2,7 @@ import React, { useState } from "react";
 // @ts-ignore
 import { Input, Button, Space, Card, Typography, message, Popconfirm } from "antd";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const RapportPage = () => {
   const [values, setValues] = useState(["", "", ""]);
