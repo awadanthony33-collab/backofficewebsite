@@ -25,7 +25,7 @@ const ROUTES  =
     'doctors' : '/mainpage/doctors',
     'alertes': '/mainpage/alertes',
     'changepassword' : '/mainpage/changepassword',
-    'Duree_de_conservation' : '/mainpage/Duree_de_conservation'
+    'Duree_de_conservation' : '/mainpage/Dureedeconservation'
 };
 
 const Navpage = () => {

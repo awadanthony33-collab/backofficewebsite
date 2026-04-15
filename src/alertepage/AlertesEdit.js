@@ -1,31 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react';
 // @ts-ignore
-import { Button, Input, message, Tabs, Spin } from 'antd';
+import { Button, Input, message, Spin } from 'antd';
 // @ts-ignore
-import { UploadOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import {  SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 // @ts-ignore
 import { getById, update } from '../api/api';
 // @ts-ignore
 import { useNavigate, useParams } from 'react-router-dom';
-// @ts-ignore
-import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 // @ts-ignore
 import mammoth from 'mammoth';
 
-// ── Quill toolbar config ──────────────────────────────────────────────
-const modules = {
-  toolbar: [
-    [{ header: [1, 2, 3, false] }],
-    [{ font: [] }, { size: [] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ color: [] }, { background: [] }],
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    [{ align: [] }],
-    ['clean'],
-  ],
-};
 
+const EditorSection = ({ lang, comment, setComment, content, setContent, fileRef, handleWordImport }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+    <div>
+      <label style={{ fontWeight: 600, display: 'block', marginBottom: 6 }}>
+        Titre / Commentaire ({lang})
+      </label>
+      <Input
+        value={comment}
+        onChange={e => setComment(e.target.value)}
+        placeholder={`Titre ${lang}`}
+      />
+    </div>
+
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <label style={{ fontWeight: 600 }}>Contenu ({lang})</label>
+
+        <input
+          type="file"
+          accept=".docx"
+          ref={fileRef}
+          style={{ display: 'none' }}
+          onChange={e => {
+            handleWordImport(e.target.files?.[0], setContent);
+            e.target.value = '';
+          }}
+        />
+
+        <Button onClick={() => fileRef.current?.click()}>
+          Importer depuis Word (.docx)
+        </Button>
+      </div>
+    </div>
+
+  </div>
+);
 const AlertesEdit = () => {
     const { id }    = useParams();
   const navigate  = useNavigate();
@@ -91,7 +114,7 @@ const AlertesEdit = () => {
         newsContentEnglish: contentEn,
       });
       message.success('News mis à jour.');
-      navigate('/mainpage/news');
+      navigate('/mainpage/alertes');
     } catch {
       message.error('Impossible de sauvegarder.');
     } finally {
@@ -105,59 +128,6 @@ const AlertesEdit = () => {
     </div>
   );
 
-  // ── Editor section (reused for FR and EN) ─────────────────────────
-  const EditorSection = ({ lang, comment, setComment, content, setContent, fileRef }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-      {/* Title / Comment */}
-      <div>
-        <label style={{ fontWeight: 600, display: 'block', marginBottom: 6 }}>
-          Titre / Commentaire ({lang})
-        </label>
-        <Input
-          value={comment}
-          onChange={e => setComment(e.target.value)}
-          placeholder={`Titre ${lang}`}
-        />
-      </div>
-
-      {/* Content */}
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <label style={{ fontWeight: 600 }}>Contenu ({lang})</label>
-
-          {/* Word import button */}
-          <>
-            <input
-              type="file"
-              accept=".docx"
-              ref={fileRef}
-              style={{ display: 'none' }}
-              onChange={e => {
-                handleWordImport(e.target.files?.[0], setContent);
-                e.target.value = ''; // reset so same file can be re-selected
-              }}
-            />
-            <Button
-              icon={<UploadOutlined />}
-              onClick={() => fileRef.current?.click()}
-            >
-              Importer depuis Word (.docx)
-            </Button>
-          </>
-        </div>
-
-        {/* Quill rich text editor */}
-        <ReactQuill
-          theme="snow"
-          value={content}
-          onChange={setContent}
-          modules={modules}
-          style={{ height: 350, marginBottom: 50 }}
-        />
-      </div>
-    </div>
-  );
 
   // ── Render ────────────────────────────────────────────────────────
   return (
@@ -168,7 +138,7 @@ const AlertesEdit = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Button
             icon={<ArrowLeftOutlined />}
-            onClick={() => navigate('/mainpage/news')}
+            onClick={() => navigate('/mainpage/alertes')}
           />
           <h2 style={{ margin: 0 }}>Modifier le news #{id}</h2>
         </div>
@@ -181,39 +151,38 @@ const AlertesEdit = () => {
         >
           Sauvegarder
         </Button>
+
       </div>
 
-      {/* Tabs FR / EN */}
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        items={[
-          {
-            key:   'fr',
-            label: '🇫🇷 Français',
-            children: (
-              <EditorSection
-                lang="FR"
-                comment={commentFr}  setComment={setCommentFr}
-                content={contentFr}  setContent={setContentFr}
-                fileRef={fileFrRef}
-              />
-            ),
-          },
-          {
-            key:   'en',
-            label: '🇬🇧 English',
-            children: (
-              <EditorSection
-                lang="EN"
-                comment={commentEn}  setComment={setCommentEn}
-                content={contentEn}  setContent={setContentEn}
-                fileRef={fileEnRef}
-              />
-            ),
-          },
-        ]}
-      />
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+  
+  <div>
+    <h3>🇫🇷 Français</h3>
+    <EditorSection
+      lang="FR"
+      comment={commentFr}
+      setComment={setCommentFr}
+      content={contentFr}
+      setContent={setContentFr}
+      fileRef={fileFrRef}
+      handleWordImport={handleWordImport}
+    />
+  </div>
+
+  <div>
+    <h3>🇬🇧 English</h3>
+    <EditorSection
+      lang="EN"
+      comment={commentEn}
+      setComment={setCommentEn}
+      content={contentEn}
+      setContent={setContentEn}
+      fileRef={fileEnRef}
+      handleWordImport={handleWordImport}
+    />
+  </div>
+
+</div>
 
     </div>
   );

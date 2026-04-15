@@ -15,8 +15,9 @@ import ChangePasswordPage from './pages/ChangePasswordPage';
 import RapportPage from './pages/Rapportpage';
 import DoctorsEditPage from './doctorspage.js/Doctors_CRUD/DoctorsEditPage';
 import DoctorAddPage from './doctorspage.js/Doctors_CRUD/DoctorAddPage';
-import Duree_de_conservation from './pages/Duree_de_conservation';
 import AlertesaddEdit from './alertepage/AlertesEdit';
+import AlertesAdd from './alertepage/AlertesAdd';
+import Dureedeconservation from './pages/Dureedeconservation';
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
           colorPrimary: '#a4091b',
           borderRadius: 8,
           fontFamily: "'DM Sans', sans-serif",
-        },
+        },  
       }}
     >
       <Router>
@@ -42,15 +43,16 @@ function App() {
             }
           >
 
-            <Route index element={<Navigate to="rapport" replace />} />
-            <Route path="rapport"         element={<RapportPage />} />
-            <Route path="doctors"         element={<DoctorsPage />} />
-            <Route path="/mainpage/doctors/edit/:id" element={<DoctorsEditPage />} /> 
-            <Route path="/mainpage/doctors/new"        element={<DoctorAddPage />} />
-            <Route path="alertes"         element={<AlertesPage />} />
-            <Route path="/mainpage/news/edit/:id" element={<AlertesaddEdit />} />
-            <Route path="changepassword" element={<ChangePasswordPage />} />
-            <Route path="Duree_de_conservation" element={<Duree_de_conservation/>} />
+            <Route index                              element={<Navigate to="rapport" replace />} />
+            <Route path="rapport"                     element={<RapportPage />} />
+            <Route path="doctors"                     element={<DoctorsPage />} />
+            <Route path="/mainpage/doctors/edit/:id"  element={<DoctorsEditPage />} /> 
+            <Route path="/mainpage/doctors/new"       element={<DoctorAddPage />} />
+            <Route path="alertes"                     element={<AlertesPage />} />
+            <Route path="/mainpage/alertes/edit/:id"  element={<AlertesaddEdit />} />
+            <Route path="/mainpage/alertes/new"       element={<AlertesAdd />} />
+            <Route path="changepassword"              element={<ChangePasswordPage />} />
+            <Route path="Dureedeconservation"       element={<Dureedeconservation/>} />
           </Route>
 
           <Route path="/" element={<Navigate to="/login" replace />} />

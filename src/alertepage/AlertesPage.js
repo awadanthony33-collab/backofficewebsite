@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 // @ts-ignore
 import { Table, Button, Space, message, Tabs } from 'antd';
 // @ts-ignore
-import { ReloadOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 // @ts-ignore
 import { getAll, remove, update } from '../api/api';
 // @ts-ignore
 import { useNavigate } from 'react-router-dom';
 import { Switch, Tag } from '../../node_modules/antd/es/index';
 // @ts-ignore
-import mammoth from 'mammoth';
 
 const { Column } = Table;
 
@@ -18,12 +17,8 @@ const AlertesPage = () => {
   const [loading,     setLoading]     = useState(false);
   const [activeTab,   setActiveTab]   = useState('active');
   const [togglingId,  setTogglingId]  = useState(null);
-  const [importingId, setImportingId] = useState(null);
   const navigate = useNavigate();
 
-  // Single hidden file input shared across all rows
-  const fileInputRef    = useRef(null);
-  const importingRecord = useRef(null); // which row triggered the import
 
   // ── Fetch ────────────────────────────────────────────────────────────
   const fetchnews = async () => {
@@ -68,54 +63,7 @@ const AlertesPage = () => {
     }
   };
 
-  // ── Word import ──────────────────────────────────────────────────────
-  // Step 1: click button on a row → store record + open file picker
-  const handleImportClick = (record) => {
-    importingRecord.current  = record;
-    fileInputRef.current.value = ''; // allow re-selecting same file
-    fileInputRef.current.click();
-  };
-
-  // Step 2: file selected → Mammoth converts .docx → HTML → PUT to API
-  const handleFileChange = async (e) => {
-    const file   = e.target.files?.[0];
-    const record = importingRecord.current;
-    if (!file || !record) return;
-
-    setImportingId(record.newsId);
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const result      = await mammoth.convertToHtml({ arrayBuffer });
-      const html        = result.value;
-
-      // Ask which language this document is for
-      const isFr = window.confirm('Cliquez OK pour Français\nAnnuler pour English');
-
-      const updatedRecord = {
-        ...record,
-        ...(isFr
-          ? { newsContentFrench:  html }
-          : { newsContentEnglish: html }
-        ),
-      };
-
-      await update('NewsPointers', record.newsId, updatedRecord);
-
-      setnews(prev =>
-        prev.map(d => d.newsId === record.newsId ? { ...d, ...updatedRecord } : d)
-      );
-
-      message.success(
-        isFr ? 'Contenu FR importé avec succès.' : 'EN content imported successfully.'
-      );
-    } catch (err) {
-      console.error(err);
-      message.error("Impossible d'importer le fichier Word.");
-    } finally {
-      setImportingId(null);
-      importingRecord.current = null;
-    }
-  };
+  
 
   // ── Filters ──────────────────────────────────────────────────────────
   const activenews   = news.filter(n => String(n.newsActive) === '1');
@@ -153,22 +101,6 @@ const AlertesPage = () => {
         )}
       />
 
-      {/* ── Import Word column ── */}
-      <Column
-        title="Import Word"
-        key="import"
-        render={(_, record) => (
-          <Button
-            size="small"
-            icon={<UploadOutlined />}
-            loading={importingId === record.newsId}
-            onClick={() => handleImportClick(record)}
-          >
-            Importer .docx
-          </Button>
-        )}
-      />
-
       <Column
         title="Actions"
         key="actions"
@@ -177,7 +109,7 @@ const AlertesPage = () => {
             <Button
               size="small"
               type="link"
-              onClick={() => navigate(`/mainpage/news/edit/${record.newsId}`)}
+              onClick={() => navigate(`/mainpage/alertes/edit/${record.newsId}`)}
             >
               Modifier
             </Button>
@@ -199,13 +131,7 @@ const AlertesPage = () => {
   return (
     <div>
       {/* Single hidden file input shared across all rows */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".docx"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
+
 
       <div className="toolbar">
         <div />
@@ -213,7 +139,7 @@ const AlertesPage = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => navigate('/mainpage/news/new')}
+            onClick={() => navigate('/mainpage/alertes/new')}
           >
             Ajouter un news
           </Button>
