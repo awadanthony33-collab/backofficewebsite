@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 // @ts-ignore
-import { Button, Input, message, Select, Tabs, Tag } from 'antd';
+import { Button, Input, message, Select, Tag } from 'antd';
 // @ts-ignore
-import { SaveOutlined, EyeOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons';
+import { SaveOutlined, FileAddOutlined } from '@ant-design/icons';
 // @ts-ignore
 import { create } from '../api/api';
 // @ts-ignore
@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
    EditorSection – handles title input + HTML file import + raw/preview tabs
 ───────────────────────────────────────────────────────────────────────────── */
 const EditorSection = ({ lang, comment, setComment, content, setContent, fileRef, handleHtmlImport }) => {
-  const [tab, setTab] = useState('edit');
+
 
   // Wrap content in a full doc for the preview iframe so styles apply
   const previewDoc = `<!DOCTYPE html>
@@ -25,7 +25,10 @@ const EditorSection = ({ lang, comment, setComment, content, setContent, fileRef
       img { max-width: 100%; }
     </style>
   </head>
-  <body>${content || '<em style="color:#999">Aucun contenu à afficher.</em>'}</body>
+${content 
+  ? content 
+  : '<em style="color:#999">Importez un fichier HTML pour afficher le contenu.</em>'
+}
 </html>`;
 
   return (
@@ -68,57 +71,21 @@ const EditorSection = ({ lang, comment, setComment, content, setContent, fileRef
           </Button>
         </div>
 
-        {/* Edit / Preview tabs */}
-        <Tabs
-          size="small"
-          activeKey={tab}
-          onChange={setTab}
-          items={[
-            {
-              key: 'edit',
-              label: <span><EditOutlined /> Éditer (HTML)</span>,
-              children: (
-                <textarea
-                  value={content}
-                  onChange={e => setContent(e.target.value)}
-                  placeholder="Collez ou saisissez du HTML ici…"
-                  rows={12}
-                  style={{
-                    width: '100%',
-                    fontFamily: 'monospace',
-                    fontSize: 13,
-                    border: '1px solid #d9d9d9',
-                    borderRadius: 6,
-                    padding: 10,
-                    resize: 'vertical',
-                    boxSizing: 'border-box',
-                    lineHeight: 1.6,
-                  }}
-                />
-              ),
-            },
-            {
-              key: 'preview',
-              label: <span><EyeOutlined /> Aperçu</span>,
-              children: (
-                // Use an iframe so <style> blocks inside the stored HTML apply correctly
-                <iframe
-                  srcDoc={previewDoc}
-                  title={`preview-${lang}`}
-                  style={{
-                    width: '100%',
-                    minHeight: 300,
-                    border: '1px solid #d9d9d9',
-                    borderRadius: 6,
-                    background: '#fafafa',
-                    display: 'block',
-                  }}
-                  sandbox="allow-same-origin"
-                />
-              ),
-            },
-          ]}
-        />
+<div>
+  <iframe
+    srcDoc={previewDoc}
+    title={`preview-${lang}`}
+    style={{
+      width: '100%',
+      minHeight: 300,
+      border: '1px solid #d9d9d9',
+      borderRadius: 6,
+      background: '#fafafa',
+      display: 'block',
+    }}
+    sandbox="allow-same-origin"
+  />
+</div>
 
         {/* Character count badge */}
         {content && (
