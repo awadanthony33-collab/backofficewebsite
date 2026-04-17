@@ -4,6 +4,8 @@ import { Form, Input, Button, Card, message } from 'antd';
 // @ts-ignore
 import { LockOutlined, SaveOutlined } from '@ant-design/icons';
 
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:54608/api';
+
 const ChangePasswordPage = () => {
   const [form]          = Form.useForm();
   const [saving, setSaving] = useState(false);
@@ -14,15 +16,15 @@ const ChangePasswordPage = () => {
   const handleFinish = async (values) => {
     setSaving(true);
     try {
-const response = await fetch('http://localhost:54608/api/LogUsers/changepassword', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    users:           username,
-    currentPassword: values.currentPassword,
-    newPassword:     values.newPassword,
-  }),
-});
+      const response = await fetch(`${BASE_URL}/LogUsers/changepassword`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          users:           username,
+          currentPassword: values.currentPassword,
+          newPassword:     values.newPassword,
+        }),
+      });
 
       if (response.ok) {
         message.success('Mot de passe modifié avec succès!');

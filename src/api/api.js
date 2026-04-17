@@ -3,7 +3,7 @@
 //  Usage: import { getAll, getById, create, update, remove }
 // ─────────────────────────────────────────────────────────
 
-const BASE_URL = 'http://localhost:54608/api';
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:54608/api';
 
 
 // ── Get headers ───────────────────────────────────────────
@@ -51,8 +51,9 @@ export const update = async (endpoint, id, data) => {
   });
   if (!response.ok) throw new Error(`PUT ${endpoint}/${id} failed`);
 };
-export const post = create;   
-export const put = update; 
+export const post = create;
+export const put = update;
+
 // ── DELETE — remove record ────────────────────────────────
 export const remove = async (endpoint, id) => {
   const response = await fetch(`${BASE_URL}/${endpoint}/${id}`, {
