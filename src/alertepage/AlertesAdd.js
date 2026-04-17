@@ -1,98 +1,224 @@
-import React, { useState,  useRef } from 'react';
+import React, { useState, useRef } from 'react';
 // @ts-ignore
-import { Button, Input, message ,Select} from 'antd';
+import { Button, Input, message, Select, Tabs, Tag } from 'antd';
 // @ts-ignore
-import {  SaveOutlined,  } from '@ant-design/icons';
+import { SaveOutlined, EyeOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons';
 // @ts-ignore
-import {  create } from '../api/api';
+import { create } from '../api/api';
 // @ts-ignore
 import { useNavigate } from 'react-router-dom';
-import 'react-quill-new/dist/quill.snow.css';
-// @ts-ignore
-import mammoth from 'mammoth';
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   EditorSection – handles title input + HTML file import + raw/preview tabs
+───────────────────────────────────────────────────────────────────────────── */
+const EditorSection = ({ lang, comment, setComment, content, setContent, fileRef, handleHtmlImport }) => {
+  const [tab, setTab] = useState('edit');
 
-const EditorSection = ({ lang, comment, setComment, content, setContent, fileRef, handleWordImport }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+  // Wrap content in a full doc for the preview iframe so styles apply
+  const previewDoc = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      body { margin: 0; padding: 12px; font-family: Georgia, serif; font-size: 14px; line-height: 1.8; color: #1a1a1a; }
+      img { max-width: 100%; }
+    </style>
+  </head>
+  <body>${content || '<em style="color:#999">Aucun contenu à afficher.</em>'}</body>
+</html>`;
 
-    <div>
-      <label style={{ fontWeight: 600, display: 'block', marginBottom: 6 }}>
-        Titre / Commentaire ({lang})
-      </label>
-      <Input
-        value={comment}
-        onChange={e => setComment(e.target.value)}
-        placeholder={`Titre ${lang}`}
-      />
-    </div>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <label style={{ fontWeight: 600 }}>Contenu ({lang})</label>
+      {/* Title */}
+      <div>
+        <label style={{ fontWeight: 600, display: 'block', marginBottom: 6 }}>
+          Titre / Commentaire ({lang})
+        </label>
+        <Input
+          value={comment}
+          onChange={e => setComment(e.target.value)}
+          placeholder={`Titre ${lang}`}
+        />
+      </div>
 
-        <input
-          type="file"
-          accept=".docx"
-          ref={fileRef}
-          style={{ display: 'none' }}
-          onChange={e => {
-            handleWordImport(e.target.files?.[0], setContent);
-            e.target.value = '';
-          }}
+      {/* Content */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <label style={{ fontWeight: 600 }}>Contenu ({lang})</label>
+
+          {/* Hidden file input */}
+          <input
+            type="file"
+            accept=".html,.htm"
+            ref={fileRef}
+            style={{ display: 'none' }}
+            onChange={e => {
+              handleHtmlImport(e.target.files?.[0], setContent);
+              e.target.value = '';
+            }}
+          />
+
+          <Button
+            icon={<FileAddOutlined />}
+            onClick={() => fileRef.current?.click()}
+          >
+            Importer depuis HTML (.html)
+          </Button>
+        </div>
+
+        {/* Edit / Preview tabs */}
+        <Tabs
+          size="small"
+          activeKey={tab}
+          onChange={setTab}
+          items={[
+            {
+              key: 'edit',
+              label: <span><EditOutlined /> Éditer (HTML)</span>,
+              children: (
+                <textarea
+                  value={content}
+                  onChange={e => setContent(e.target.value)}
+                  placeholder="Collez ou saisissez du HTML ici…"
+                  rows={12}
+                  style={{
+                    width: '100%',
+                    fontFamily: 'monospace',
+                    fontSize: 13,
+                    border: '1px solid #d9d9d9',
+                    borderRadius: 6,
+                    padding: 10,
+                    resize: 'vertical',
+                    boxSizing: 'border-box',
+                    lineHeight: 1.6,
+                  }}
+                />
+              ),
+            },
+            {
+              key: 'preview',
+              label: <span><EyeOutlined /> Aperçu</span>,
+              children: (
+                // Use an iframe so <style> blocks inside the stored HTML apply correctly
+                <iframe
+                  srcDoc={previewDoc}
+                  title={`preview-${lang}`}
+                  style={{
+                    width: '100%',
+                    minHeight: 300,
+                    border: '1px solid #d9d9d9',
+                    borderRadius: 6,
+                    background: '#fafafa',
+                    display: 'block',
+                  }}
+                  sandbox="allow-same-origin"
+                />
+              ),
+            },
+          ]}
         />
 
-        <Button onClick={() => fileRef.current?.click()}>
-          Importer depuis Word (.docx)
-        </Button>
+        {/* Character count badge */}
+        {content && (
+          <div style={{ marginTop: 4, textAlign: 'right' }}>
+            <Tag color="blue">{content.length} caractères</Tag>
+          </div>
+        )}
       </div>
     </div>
+  );
+};
 
-  </div>
-);
+/* ─────────────────────────────────────────────────────────────────────────────
+   AlertesAdd
+───────────────────────────────────────────────────────────────────────────── */
 const AlertesAdd = () => {
   const navigate = useNavigate();
 
-  const [saving, setSaving] = useState(false);
-    const [status, setStatus] = useState(true);
-  const [commentFr, setCommentFr] = useState('');
-  const [commentEn, setCommentEn] = useState('');
-  const [contentFr, setContentFr] = useState('');
-  const [contentEn, setContentEn] = useState('');
+  const [saving,     setSaving]     = useState(false);
+  const [status,     setStatus]     = useState(true);
+  const [commentFr,  setCommentFr]  = useState('');
+  const [commentEn,  setCommentEn]  = useState('');
+  const [contentFr,  setContentFr]  = useState('');
+  const [contentEn,  setContentEn]  = useState('');
 
   const fileFrRef = useRef(null);
   const fileEnRef = useRef(null);
 
-  const handleWordImport = async (file, setContent) => {
+  /* ── HTML import ─────────────────────────────────────────────────── */
+  const handleHtmlImport = (file, setContent) => {
     if (!file) return;
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const result = await mammoth.convertToHtml({ arrayBuffer });
-      setContent(result.value);
-      message.success('Document importé avec succès.');
-    } catch {
-      message.error("Impossible de lire le fichier Word.");
-    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const buffer = e.target?.result;
+      if (!(buffer instanceof ArrayBuffer)) return;
+
+      // 1️⃣ Peek at the first 2 KB as UTF-8 to find the charset declaration
+      const peek = new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(buffer, 0, 2048));
+      const charsetMatch = peek.match(/charset=["']?\s*([^"'\s;>]+)/i);
+      const declared = charsetMatch ? charsetMatch[1].toLowerCase().trim() : 'utf-8';
+
+      const knownAliases = { 'iso-8859-1': 'windows-1252', 'latin-1': 'windows-1252', 'win-1252': 'windows-1252' };
+      const encoding = knownAliases[declared] ?? declared;
+
+      // 2️⃣ Decode the whole file with the correct encoding
+      let raw;
+      try {
+        raw = new TextDecoder(encoding, { fatal: true }).decode(buffer);
+      } catch {
+        raw = new TextDecoder('windows-1252', { fatal: false }).decode(buffer);
+      }
+
+      // 3️⃣ Parse
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(raw, 'text/html');
+
+      // ✅ Move <style> blocks from <head> into <body> BEFORE removing head,
+      //    so they are preserved in body.innerHTML and applied when rendered.
+      doc.querySelectorAll('head style').forEach(styleEl => {
+        doc.body.insertBefore(styleEl.cloneNode(true), doc.body.firstChild);
+      });
+
+      // Remove noise: scripts, head, meta, link, noscript (but NOT style – already moved)
+      doc.querySelectorAll('script, meta, link, noscript, head').forEach(el => el.remove());
+
+      const body = doc.body;
+      if (!body) { message.error("Aucun contenu trouvé dans le fichier HTML."); return; }
+
+      // Remove top-level whitespace-only text nodes
+      body.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE && !node.textContent.trim()) node.remove();
+      });
+
+      const clean = body.innerHTML.trim();
+      if (!clean) { message.warning("Le fichier HTML semble vide après nettoyage."); return; }
+
+      setContent(clean);
+      message.success(`Fichier HTML importé (encodage: ${encoding}).`);
+    };
+    reader.onerror = () => message.error("Impossible de lire le fichier HTML.");
+    reader.readAsArrayBuffer(file);
   };
 
+  /* ── Save ────────────────────────────────────────────────────────── */
   const handleSave = async () => {
     if (!commentFr || !commentEn) {
       message.warning('Les commentaires FR et EN sont obligatoires.');
       return;
     }
-
     setSaving(true);
-
     try {
-await create('NewsPointers', {
-  newsCommentFrench:  commentFr,
-  newsCommentEnglish: commentEn,
-  newsContentFrench:  contentFr,
-  newsContentEnglish: contentEn,
-  newsActive: status ? '1' : '0',
-});
+      await create('NewsPointers', {
+        newsCommentFrench:  commentFr,
+        newsCommentEnglish: commentEn,
+        newsContentFrench:  contentFr,
+        newsContentEnglish: contentEn,
+        newsActive: status ? '1' : '0',
+      });
       message.success('News créée avec succès.');
       navigate('/mainpage/alertes');
-
     } catch {
       message.error("Impossible d'ajouter une news.");
     } finally {
@@ -100,26 +226,40 @@ await create('NewsPointers', {
     }
   };
 
+  /* ── Render ──────────────────────────────────────────────────────── */
   return (
     <div style={{ padding: 24 }}>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
-        <h2>Créer une news</h2>
-
-        <Button
-          type="primary"
-          icon={<SaveOutlined />}
-          loading={saving}
-          onClick={handleSave}
-        >
-          Sauvegarder
-        </Button>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h2 style={{ margin: 0 }}>Créer une news</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <label style={{ fontWeight: 600 }}>Statut :</label>
+          <Select
+            value={status}
+            onChange={setStatus}
+            style={{ width: 120 }}
+            options={[
+              { value: true,  label: '✅ Actif'   },
+              { value: false, label: '🔴 Inactif' },
+            ]}
+          />
+          <Button
+            type="primary"
+            icon={<SaveOutlined />}
+            loading={saving}
+            onClick={handleSave}
+          >
+            Sauvegarder
+          </Button>
+        </div>
       </div>
 
+      {/* Two-column editors */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
 
-        <div>
-          <h3>🇫🇷 Français</h3>
+        <div style={{ background: '#fff', border: '1px solid #f0f0f0', borderRadius: 8, padding: 20 }}>
+          <h3 style={{ marginTop: 0 }}>🇫🇷 Français</h3>
           <EditorSection
             lang="FR"
             comment={commentFr}
@@ -127,12 +267,12 @@ await create('NewsPointers', {
             content={contentFr}
             setContent={setContentFr}
             fileRef={fileFrRef}
-            handleWordImport={handleWordImport}
+            handleHtmlImport={handleHtmlImport}
           />
         </div>
 
-        <div>
-          <h3>🇬🇧 English</h3>
+        <div style={{ background: '#fff', border: '1px solid #f0f0f0', borderRadius: 8, padding: 20 }}>
+          <h3 style={{ marginTop: 0 }}>🇬🇧 English</h3>
           <EditorSection
             lang="EN"
             comment={commentEn}
@@ -140,24 +280,13 @@ await create('NewsPointers', {
             content={contentEn}
             setContent={setContentEn}
             fileRef={fileEnRef}
-            handleWordImport={handleWordImport}
+            handleHtmlImport={handleHtmlImport}
           />
         </div>
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ fontWeight: 600 }}>Statut</label>
-          <div>
-        <Select
-          value={status}
-          onChange={setStatus}
-          options={[
-            { value: true, label: 'Actif' },
-            { value: false, label: 'Inactif' },
-          ]}
-        />
-          </div>
-        </div>
+
       </div>
     </div>
   );
 };
+
 export default AlertesAdd;

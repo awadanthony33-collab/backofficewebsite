@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // @ts-ignore
-import { Form, Input, Button, Card, DatePicker, message, Spin ,Row, Col} from 'antd';
+import { Form, Input, Button, Card, message, Spin ,Row, Col} from 'antd';
 // @ts-ignore
 import { useNavigate, useParams } from 'react-router-dom';
 // @ts-ignore
