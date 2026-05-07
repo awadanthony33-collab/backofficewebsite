@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 // @ts-ignore
-import { Button, Input, message, Spin} from 'antd';
+import { Button, Input, message, Spin, Tag } from 'antd';
 // @ts-ignore
-import { SaveOutlined, ArrowLeftOutlined, FileAddOutlined } from '@ant-design/icons';
+import { SaveOutlined, ArrowLeftOutlined, FolderOpenOutlined } from '@ant-design/icons';
 // @ts-ignore
 import { getById, update } from '../api/api';
 // @ts-ignore
 import { useNavigate, useParams } from 'react-router-dom';
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   EditorSection – handles title input + HTML file import + raw/preview tabs
+   EditorSection
 ───────────────────────────────────────────────────────────────────────────── */
-const EditorSection = ({ lang, comment, setComment, content, setContent, fileRef, handleHtmlImport }) => {
+const EditorSection = ({ lang, comment, setComment, content, setContent, folderRef, handleFolderImport }) => {
 
-  // Wrap content in a full doc for the preview iframe so styles apply
   const previewDoc = `<!DOCTYPE html>
 <html>
   <head>
@@ -24,11 +23,7 @@ const EditorSection = ({ lang, comment, setComment, content, setContent, fileRef
       img { max-width: 100%; }
     </style>
   </head>
-  <body>${
-  content
-    ? content
-    : '<em style="color:#999">Importez un fichier HTML pour afficher le contenu.</em>'
-}</body>
+  <body>${content || '<em style="color:#999">Importez un dossier Word (HTM + images).</em>'}</body>
 </html>`;
 
   return (
@@ -51,41 +46,54 @@ const EditorSection = ({ lang, comment, setComment, content, setContent, fileRef
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <label style={{ fontWeight: 600 }}>Contenu ({lang})</label>
 
-          {/* Hidden file input */}
+          {/* ✅ Folder picker — selects the whole Word export folder */}
           <input
             type="file"
-            accept=".html,.htm"
-            ref={fileRef}
+            ref={folderRef}
             style={{ display: 'none' }}
+            multiple
+            // @ts-ignore
+            webkitdirectory=""
             onChange={e => {
-              handleHtmlImport(e.target.files?.[0], setContent);
+              handleFolderImport(e.target.files, setContent);
               e.target.value = '';
             }}
           />
 
-          <Button
-            icon={<FileAddOutlined />}
-            onClick={() => fileRef.current?.click()}
-          >
-            Importer depuis HTML (.html)
-          </Button>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {content && (
+              <Button danger size="small" onClick={() => setContent('')}>
+                Effacer
+              </Button>
+            )}
+            <Button
+              icon={<FolderOpenOutlined />}
+              onClick={() => folderRef.current?.click()}
+            >
+              📁 Importer dossier Word
+            </Button>
+          </div>
         </div>
-<div>
 
-  <iframe
-    srcDoc={previewDoc}
-    title={`preview-${lang}`}
-    style={{
-      width: '100%',
-      minHeight: 300,
-      border: '1px solid #d9d9d9',
-      borderRadius: 6,
-      background: '#fafafa',
-      display: 'block',
-    }}
-    sandbox="allow-same-origin"
-  />
-</div>
+        <iframe
+          srcDoc={previewDoc}
+          title={`preview-${lang}`}
+          style={{
+            width: '100%',
+            minHeight: 300,
+            border: '1px solid #d9d9d9',
+            borderRadius: 6,
+            background: '#fafafa',
+            display: 'block',
+          }}
+          sandbox="allow-same-origin"
+        />
+
+        {content && (
+          <div style={{ marginTop: 4, textAlign: 'right' }}>
+            <Tag color="blue">{content.length} caractères</Tag>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -106,8 +114,8 @@ const AlertesEdit = () => {
   const [contentEn, setContentEn] = useState('');
   const [record,    setRecord]    = useState(null);
 
-  const fileFrRef = useRef(null);
-  const fileEnRef = useRef(null);
+  const folderFrRef = useRef(null);
+  const folderEnRef = useRef(null);
 
   /* ── Fetch existing news ─────────────────────────────────────────── */
   useEffect(() => {
@@ -117,8 +125,8 @@ const AlertesEdit = () => {
         setRecord(data);
         setCommentFr(data.newsCommentFrench  ?? '');
         setCommentEn(data.newsCommentEnglish ?? '');
-        setContentFr(data.newsContentFrench  ?? '');
-        setContentEn(data.newsContentEnglish ?? '');
+        setContentFr(data.newsContentFrench  ?? '');  // ← comes from file via backend
+        setContentEn(data.newsContentEnglish ?? '');  // ← comes from file via backend
       } catch {
         message.error('Impossible de charger le news.');
         navigate('/mainpage/alertes');
@@ -129,64 +137,111 @@ const AlertesEdit = () => {
     fetchRecord();
   }, [id, navigate]);
 
-  /* ── HTML import ─────────────────────────────────────────────────── */
-  const handleHtmlImport = (file, setContent) => {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const buffer = e.target?.result;
-      if (!(buffer instanceof ArrayBuffer)) return;
+  /* ── Folder import — reads HTM + converts all images to base64 ───── */
+  const handleFolderImport = async (files, setContent) => {
+    if (!files || files.length === 0) return;
 
-      // 1️⃣ Peek at the first 2 KB as UTF-8 to find the charset declaration
-      const peek = new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(buffer, 0, 2048));
-      const charsetMatch = peek.match(/charset=["']?\s*([^"'\s;>]+)/i);
-      const declared = charsetMatch ? charsetMatch[1].toLowerCase().trim() : 'utf-8';
+    const allFiles = Array.from(files);
 
-      const knownAliases = { 'iso-8859-1': 'windows-1252', 'latin-1': 'windows-1252', 'win-1252': 'windows-1252' };
-      const encoding = knownAliases[declared] ?? declared;
+    // 1️⃣ Find the .htm / .html file
+    const htmFile = allFiles.find(f =>
+      f.name.toLowerCase().endsWith('.htm') ||
+      f.name.toLowerCase().endsWith('.html')
+    );
 
-      // 2️⃣ Decode the whole file with the correct encoding
-      let raw;
-      try {
-        raw = new TextDecoder(encoding, { fatal: true }).decode(buffer);
-      } catch {
-        raw = new TextDecoder('windows-1252', { fatal: false }).decode(buffer);
-      }
+    if (!htmFile) {
+      message.error('Aucun fichier .htm trouvé dans le dossier.');
+      return;
+    }
 
-      // 3️⃣ Parse
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(raw, 'text/html');
-
-      // ✅ Move <style> blocks from <head> into <body> BEFORE removing head,
-      //    so they are preserved in body.innerHTML and applied when rendered.
-      doc.querySelectorAll('head style').forEach(styleEl => {
-        doc.body.insertBefore(styleEl.cloneNode(true), doc.body.firstChild);
+    // 2️⃣ Build image map: filename → File
+    const imageMap = {};
+    allFiles
+      .filter(f => f.type.startsWith('image/'))
+      .forEach(f => {
+        imageMap[f.name.toLowerCase()] = f;
       });
 
-      // Remove noise: scripts, head, meta, link, noscript (but NOT style – already moved)
-      doc.querySelectorAll('script, meta, link, noscript, head').forEach(el => el.remove());
+    // 3️⃣ Read the HTM file
+    const buffer = await htmFile.arrayBuffer();
 
-      const body = doc.body;
-      if (!body) { message.error("Aucun contenu trouvé dans le fichier HTML."); return; }
+    const peek = new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(buffer, 0, 2048));
+    const charsetMatch = peek.match(/charset=["']?\s*([^"'\s;>]+)/i);
+    const declared = charsetMatch ? charsetMatch[1].toLowerCase().trim() : 'utf-8';
+    const knownAliases = { 'iso-8859-1': 'windows-1252', 'latin-1': 'windows-1252', 'win-1252': 'windows-1252' };
+    const encoding = knownAliases[declared] ?? declared;
 
-      body.childNodes.forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE && !node.textContent.trim()) node.remove();
-      });
+    let raw;
+    try {
+      raw = new TextDecoder(encoding, { fatal: true }).decode(buffer);
+    } catch {
+      raw = new TextDecoder('windows-1252', { fatal: false }).decode(buffer);
+    }
 
-      const clean = body.innerHTML.trim();
-      if (!clean) { message.warning("Le fichier HTML semble vide après nettoyage."); return; }
+    // 4️⃣ Parse HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(raw, 'text/html');
 
-      setContent(clean);
-      message.success(`Fichier HTML importé (encodage: ${encoding}).`);
-    };
-    reader.onerror = () => message.error("Impossible de lire le fichier HTML.");
-    reader.readAsArrayBuffer(file);
+    // Move <style> from <head> into <body> before removing head
+    doc.querySelectorAll('head style').forEach(styleEl => {
+      doc.body.insertBefore(styleEl.cloneNode(true), doc.body.firstChild);
+    });
+    doc.querySelectorAll('script, meta, link, noscript, head').forEach(el => el.remove());
+
+    const body = doc.body;
+    if (!body) { message.error('Aucun contenu trouvé.'); return; }
+
+    // 5️⃣ Find all local images and convert to base64
+    const imgEls = [...body.querySelectorAll('img')].filter(img => {
+      const src = img.getAttribute('src') || '';
+      return !src.startsWith('data:') && !src.startsWith('http');
+    });
+
+    if (imgEls.length > 0) {
+      message.loading({ content: `Intégration de ${imgEls.length} image(s)…`, key: 'img' });
+
+      await Promise.all(imgEls.map(img => new Promise(resolve => {
+        const src      = img.getAttribute('src') || '';
+        // Extract filename only e.g. "Doc1_files/image001.png" → "image001.png"
+        const fileName = src.split('/').pop().split('\\').pop().toLowerCase();
+        const file     = imageMap[fileName];
+
+        if (!file) {
+          message.warning(`Image introuvable: ${fileName}`);
+          img.remove();
+          resolve();
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = ev => {
+          // ✅ Replace local path with base64 — fully self-contained
+          img.setAttribute('src', ev.target.result);
+          resolve();
+        };
+        reader.onerror = () => { img.remove(); resolve(); };
+        reader.readAsDataURL(file);
+      })));
+
+      message.success({ content: `${imgEls.length} image(s) intégrées.`, key: 'img' });
+    }
+
+    // 6️⃣ Clean whitespace-only text nodes
+    body.childNodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE && !node.textContent.trim()) node.remove();
+    });
+
+    const clean = body.innerHTML.trim();
+    if (!clean) { message.warning('Le fichier HTML semble vide.'); return; }
+
+    setContent(clean);
+    message.success(`Importé avec succès (encodage: ${encoding}, ${imgEls.length} image(s) intégrées).`);
   };
 
   /* ── Save ────────────────────────────────────────────────────────── */
   const handleSave = async () => {
     if (!commentFr || !commentEn) {
-      message.warning('Les commentaires FR et EN sont obligatoires.');
+      message.warning('Les titres FR et EN sont obligatoires.');
       return;
     }
     setSaving(true);
@@ -195,8 +250,8 @@ const AlertesEdit = () => {
         ...record,
         newsCommentFrench:  commentFr,
         newsCommentEnglish: commentEn,
-        newsContentFrench:  contentFr,
-        newsContentEnglish: contentEn,
+        newsContentFrench:  contentFr,   // ← backend overwrites newsfrench/{id}.html
+        newsContentEnglish: contentEn,   // ← backend overwrites newsenglish/{id}.html
       });
       message.success('News mis à jour.');
       navigate('/mainpage/alertes');
@@ -248,8 +303,8 @@ const AlertesEdit = () => {
             setComment={setCommentFr}
             content={contentFr}
             setContent={setContentFr}
-            fileRef={fileFrRef}
-            handleHtmlImport={handleHtmlImport}
+            folderRef={folderFrRef}
+            handleFolderImport={handleFolderImport}
           />
         </div>
 
@@ -261,8 +316,8 @@ const AlertesEdit = () => {
             setComment={setCommentEn}
             content={contentEn}
             setContent={setContentEn}
-            fileRef={fileEnRef}
-            handleHtmlImport={handleHtmlImport}
+            folderRef={folderEnRef}
+            handleFolderImport={handleFolderImport}
           />
         </div>
 

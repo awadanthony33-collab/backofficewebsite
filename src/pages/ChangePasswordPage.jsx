@@ -81,7 +81,7 @@ const ChangePasswordPage = () => {
             />
           </Form.Item>
 
-          {/* Confirm new password */}
+  
           <Form.Item
             name="confirmPassword"
             label="Confirmer le nouveau mot de passe"

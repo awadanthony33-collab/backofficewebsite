@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from 'react';
 // @ts-ignore
-import { Table, Button, Space, message, Tabs } from 'antd';
+import { Table, Button, Space, message, Tabs, Switch, Tag } from 'antd'; // ✅ fixed import
 // @ts-ignore
 import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 // @ts-ignore
 import { getAll, remove, update } from '../api/api';
 // @ts-ignore
 import { useNavigate } from 'react-router-dom';
-import { Switch, Tag } from '../../node_modules/antd/es/index';
-// @ts-ignore
 
 const { Column } = Table;
 
 const AlertesPage = () => {
-  const [news,        setnews]        = useState([]);
-  const [loading,     setLoading]     = useState(false);
-  const [activeTab,   setActiveTab]   = useState('active');
-  const [togglingId,  setTogglingId]  = useState(null);
+  const [news,       setnews]       = useState([]);
+  const [loading,    setLoading]    = useState(false);
+  const [activeTab,  setActiveTab]  = useState('active');
+  const [togglingId, setTogglingId] = useState(null);
   const navigate = useNavigate();
 
-
-  // ── Fetch ────────────────────────────────────────────────────────────
+  // ── Fetch ──────────────────────────────────────────────────────────
   const fetchnews = async () => {
     setLoading(true);
     try {
@@ -35,7 +32,7 @@ const AlertesPage = () => {
 
   useEffect(() => { fetchnews(); }, []);
 
-  // ── Delete ───────────────────────────────────────────────────────────
+  // ── Delete ─────────────────────────────────────────────────────────
   const handleDelete = async (newsId) => {
     try {
       await remove('NewsPointers', newsId);
@@ -46,12 +43,18 @@ const AlertesPage = () => {
     }
   };
 
-  // ── Toggle active ────────────────────────────────────────────────────
+  // ── Toggle active ──────────────────────────────────────────────────
   const handleToggleFlag = async (record) => {
     const newActive = record.newsActive === '1' ? '0' : '1';
     setTogglingId(record.newsId);
     try {
-      await update('NewsPointers', record.newsId, { ...record, newsActive: newActive });
+      await update('NewsPointers', record.newsId, {
+        newsCommentFrench:  record.newsCommentFrench,
+        newsCommentEnglish: record.newsCommentEnglish,
+        newsActive:         newActive,
+        newsContentFrench:  null,   // ✅ null = keep existing HTML file untouched
+        newsContentEnglish: null,   // ✅ null = keep existing HTML file untouched
+      });
       message.success(newActive === '1' ? 'News activé.' : 'News désactivé.');
       setnews(prev =>
         prev.map(d => d.newsId === record.newsId ? { ...d, newsActive: newActive } : d)
@@ -63,13 +66,11 @@ const AlertesPage = () => {
     }
   };
 
-  
-
-  // ── Filters ──────────────────────────────────────────────────────────
+  // ── Filters ────────────────────────────────────────────────────────
   const activenews   = news.filter(n => String(n.newsActive) === '1');
   const inactivenews = news.filter(n => String(n.newsActive) !== '1');
 
-  // ── Table ────────────────────────────────────────────────────────────
+  // ── Table ──────────────────────────────────────────────────────────
   const NewsTable = ({ data }) => (
     <Table
       dataSource={data}
@@ -127,12 +128,9 @@ const AlertesPage = () => {
     </Table>
   );
 
-  // ── Render ───────────────────────────────────────────────────────────
+  // ── Render ─────────────────────────────────────────────────────────
   return (
     <div>
-      {/* Single hidden file input shared across all rows */}
-
-
       <div className="toolbar">
         <div />
         <Space>
