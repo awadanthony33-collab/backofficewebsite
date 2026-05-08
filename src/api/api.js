@@ -44,12 +44,18 @@ export const create = async (endpoint, data) => {
 
 // ── PUT — update existing record ──────────────────────────
 export const update = async (endpoint, id, data) => {
-  const response = await fetch(`${BASE_URL}/${endpoint}/${id}`, {
+  // Build URL — omit id if null/undefined
+  const url = id !== null && id !== undefined
+    ? `${BASE_URL}/${endpoint}/${id}`
+    : `${BASE_URL}/${endpoint}`;
+
+  const response = await fetch(url, {
     method: 'PUT',
     headers: getHeaders(),
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error(`PUT ${endpoint}/${id} failed`);
+
+  if (!response.ok) throw new Error(`PUT ${endpoint}${id ? '/' + id : ''} failed`);
 };
 export const post = create;
 export const put = update;

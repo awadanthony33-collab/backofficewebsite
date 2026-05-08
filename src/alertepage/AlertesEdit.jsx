@@ -125,8 +125,8 @@ const AlertesEdit = () => {
         setRecord(data);
         setCommentFr(data.newsCommentFrench  ?? '');
         setCommentEn(data.newsCommentEnglish ?? '');
-        setContentFr(data.newsContentFrench  ?? '');  // ← comes from file via backend
-        setContentEn(data.newsContentEnglish ?? '');  // ← comes from file via backend
+        setContentFr(data.newsContentFrench  ?? '');  
+        setContentEn(data.newsContentEnglish ?? '');  
       } catch {
         message.error('Impossible de charger le news.');
         navigate('/mainpage/alertes');
@@ -250,8 +250,8 @@ const AlertesEdit = () => {
         ...record,
         newsCommentFrench:  commentFr,
         newsCommentEnglish: commentEn,
-        newsContentFrench:  contentFr,   // ← backend overwrites newsfrench/{id}.html
-        newsContentEnglish: contentEn,   // ← backend overwrites newsenglish/{id}.html
+        newsContentFrench:  contentFr,   
+        newsContentEnglish: contentEn,
       });
       message.success('News mis à jour.');
       navigate('/mainpage/alertes');

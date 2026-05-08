@@ -1,34 +1,55 @@
 import React, { useState } from "react";
 // @ts-ignore
 import { Input, Button, Space, Card, Typography, message, Popconfirm } from "antd";
-
+import { getById } from "../api/api";
 const { Title } = Typography;
 
 const RapportPage = () => {
-  const [values, setValues] = useState(["", "", ""]);
-
+  const [values, setValues] = useState(["", "", "",""]);
+const [report, setReport] = useState(null);
   const handleChange = (index, value) => {
     const newValues = [...values];
     newValues[index] = value;
     setValues(newValues);
   };
 
-  const reportId = values.join("");
+
 
   const handleSearch = () => {
-    if (!reportId) return message.error("Format invalide");
-    message.info(`Recherche du rapport ${reportId}`);
+
   };
 
-  const handleOpen = () => {
-    if (!reportId) return message.error("Format invalide");
-    message.success(`Ouverture du rapport ${reportId}`);
-  };
+const handleOpen = async () => {
+  const [asbr, assect, asyr, asref] = values;
+
+  if (!asbr || !assect || !asyr || !asref) {
+    return message.error("Format invalide");
+  }
+
+  try {
+    const endpoint = `Reports/detail/${asbr}/${assect}/${asyr}`;
+
+    const data = await getById(endpoint, asref);
+
+    setReport(data);
+
+    message.success("Rapport chargé");
+  } catch (error) {
+    console.error(error);
+    message.error("Rapport introuvable");
+  }
+};
 
   const handleDelete = () => {
-    message.warning(`Rapport supprimé: ${reportId}`);
+    
+    message.warning(``);
   };
-
+const inputsConfig = [
+  { max: 2, width: 80 },
+  { max: 1, width: 80 },
+  { max: 2, width: 80 },
+  { max: 5, width: 180 },
+];
   return (
 <Card
   style={{
@@ -49,32 +70,28 @@ const RapportPage = () => {
 
   {/* Inputs */}
   <Space>
-    {values.map((val, index) => (
-      <Input
-        key={index}
-        value={val}
-        maxLength={
-          index === 0 ? 1 :   
-          index === 1 ? 2 :   
-          6                 
-        }
-        onChange={(e) => handleChange(index, e.target.value)}
-        style={{
-          width: index === 2 ? 180 : 80,
-          height: 50,
-          textAlign: "center",
-          fontSize: 20,
-        }}
-      />
-    ))}
+  {values.map((val, index) => (
+  <Input
+    key={index}
+    value={val}
+    maxLength={inputsConfig[index].max}
+    onChange={(e) => handleChange(index, e.target.value)}
+    style={{
+      width: inputsConfig[index].width,
+      height: 50,
+      textAlign: "center",
+      fontSize: 20,
+    }}
+  />
+))}
   </Space>
 </Space>
 
       {/* Buttons same as before */}
       <Space style={{ marginTop: 25 }}>
-        <Button type="primary" size="large" onClick={handleSearch}>
+        {/* <Button type="primary" size="large" onClick={handleSearch}>
           Rechercher
-        </Button>
+        </Button> */}
 
         <Button onClick={handleOpen} size="large">
           Ouvrir
@@ -82,14 +99,41 @@ const RapportPage = () => {
 
         <Popconfirm
           title="Supprimer ce rapport ?"
-          onConfirm={handleDelete}
+
           okText="Oui"
           cancelText="Non"
         >
           <Button danger size="large">Supprimer</Button>
         </Popconfirm>
+        
       </Space>
+
+{report && (
+  <div style={{ marginTop: 100 }}>
+    <Title level={4}>{report.aspatn} </Title>
+
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        dangerouslySetInnerHTML={{
+          __html: report.asrep,
+        }}
+      />
+    </div>
+  </div>
+)}
+
+
+
+
+ 
     </Card>
+
+    
   );
 }
 export default RapportPage;
