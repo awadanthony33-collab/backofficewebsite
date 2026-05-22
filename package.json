@@ -1,6 +1,7 @@
 {
   "name": "backoffice",
   "version": "0.1.0",
+  "homepage": "/backoffice",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.1",

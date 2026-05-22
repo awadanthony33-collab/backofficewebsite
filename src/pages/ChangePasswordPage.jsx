@@ -82,10 +82,22 @@ const ChangePasswordPage = () => {
           </Form.Item>
 
   
-          <Form.Item
-            name="confirmPassword"
-            label="Confirmer le nouveau mot de passe"
-          >
+<Form.Item
+  name="confirmPassword"
+  label="Confirmer le nouveau mot de passe"
+  dependencies={['newPassword']}
+  rules={[
+    { required: true, message: 'Veuillez confirmer le mot de passe.' },
+    ({ getFieldValue }) => ({
+      validator(_, value) {
+        if (!value || getFieldValue('newPassword') === value) {
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error('Les mots de passe ne correspondent pas.'));
+      },
+    }),
+  ]}
+>
             <Input.Password
               prefix={<LockOutlined />}
               placeholder="Confirmer le nouveau mot de passe"

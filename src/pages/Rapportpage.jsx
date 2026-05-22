@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 // @ts-ignore
 import { Input, Button, Space, Card, Typography, message, Popconfirm } from "antd";
-import { getById } from "../api/api";
+import { getById, remove_report } from "../api/api";
 const { Title } = Typography;
 
 const RapportPage = () => {
@@ -15,9 +15,9 @@ const [report, setReport] = useState(null);
 
 
 
-  const handleSearch = () => {
+  // const handleSearch = () => {
 
-  };
+  // };
 
 const handleOpen = async () => {
   const [asbr, assect, asyr, asref] = values;
@@ -40,10 +40,24 @@ const handleOpen = async () => {
   }
 };
 
-  const handleDelete = () => {
-    
-    message.warning(``);
-  };
+const handleDelete = async () => {
+  const [asbr, assect, asyr, asref] = values;
+
+  if (!asbr || !assect || !asyr || !asref) {
+    return message.error("Format invalide");
+  }
+
+  try {
+    const endpoint = `Reports/detail/${asbr}/${assect}/${asyr}/${asref}`;
+    await remove_report(endpoint);                   
+    message.success("Rapport supprimé");
+  } catch (error) {
+    console.error(error);
+    message.error("Impossible de supprimer.");
+  }
+};
+
+
 const inputsConfig = [
   { max: 2, width: 80 },
   { max: 1, width: 80 },
@@ -89,22 +103,20 @@ const inputsConfig = [
 
       {/* Buttons same as before */}
       <Space style={{ marginTop: 25 }}>
-        {/* <Button type="primary" size="large" onClick={handleSearch}>
-          Rechercher
-        </Button> */}
+      <Button type="primary" size="large" onClick={handleOpen}>Rechercher</Button>
 
         <Button onClick={handleOpen} size="large">
           Ouvrir
         </Button>
 
-        <Popconfirm
-          title="Supprimer ce rapport ?"
-
-          okText="Oui"
-          cancelText="Non"
-        >
-          <Button danger size="large">Supprimer</Button>
-        </Popconfirm>
+      <Popconfirm
+        title="Supprimer ce rapport ?"
+        onConfirm={handleDelete}      
+        okText="Oui"
+        cancelText="Non"
+      >
+        <Button danger size="large">Supprimer</Button>
+      </Popconfirm>
         
       </Space>
 
@@ -126,10 +138,6 @@ const inputsConfig = [
     </div>
   </div>
 )}
-
-
-
-
  
     </Card>
 

@@ -3,20 +3,17 @@ import { ConfigProvider } from 'antd';
 // @ts-ignore
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-import LoginPage        from './pages/LoginPage';
-import Navpage          from './pages/navpage';
-import ProtectRoute     from './protecter/ProtectRoute';
-
-// ── Page imports ──────────────────────────────────────────────────────────────
-
-import DoctorsPage      from './doctorspage.js/Doctors_Page';
-import AlertesPage      from './alertepage/AlertesPage';
-import ChangePasswordPage from './pages/ChangePasswordPage';
-import RapportPage from './pages/Rapportpage';
-import DoctorsEditPage from './doctorspage.js/Doctors_CRUD/DoctorsEditPage';
-import DoctorAddPage from './doctorspage.js/Doctors_CRUD/DoctorAddPage';
-import AlertesaddEdit from './alertepage/AlertesEdit';
-import AlertesAdd from './alertepage/AlertesAdd';
+import LoginPage           from './pages/LoginPage';
+import Navpage             from './pages/navpage';
+import ProtectRoute        from './protecter/ProtectRoute';
+import DoctorsPage         from './doctorspage.js/Doctors_Page';
+import AlertesPage         from './alertepage/AlertesPage';
+import ChangePasswordPage  from './pages/ChangePasswordPage';
+import RapportPage         from './pages/Rapportpage';
+import DoctorsEditPage     from './doctorspage.js/Doctors_CRUD/DoctorsEditPage';
+import DoctorAddPage       from './doctorspage.js/Doctors_CRUD/DoctorAddPage';
+import AlertesaddEdit      from './alertepage/AlertesEdit';
+import AlertesAdd          from './alertepage/AlertesAdd';
 import Dureedeconservation from './pages/Dureedeconservation';
 
 function App() {
@@ -27,10 +24,11 @@ function App() {
           colorPrimary: '#a4091b',
           borderRadius: 8,
           fontFamily: "'DM Sans', sans-serif",
-        },  
+        },
       }}
     >
-      <Router>
+      {/* ✅ basename makes all routes relative to /backoffice */}
+      <Router basename={process.env.PUBLIC_URL}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
 
@@ -42,21 +40,20 @@ function App() {
               </ProtectRoute>
             }
           >
-
-            <Route index                              element={<Navigate to="rapport" replace />} />
-            <Route path="rapport"                     element={<RapportPage />} />
-            <Route path="doctors"                     element={<DoctorsPage />} />
-            <Route path="/mainpage/doctors/edit/:id"  element={<DoctorsEditPage />} /> 
-            <Route path="/mainpage/doctors/new"       element={<DoctorAddPage />} />
-            <Route path="alertes"                     element={<AlertesPage />} />
-            <Route path="/mainpage/alertes/edit/:id"  element={<AlertesaddEdit />} />
-            <Route path="/mainpage/alertes/new"       element={<AlertesAdd />} />
-            <Route path="changepassword"              element={<ChangePasswordPage />} />
-            <Route path="Dureedeconservation"       element={<Dureedeconservation/>} />
+            <Route index                         element={<Navigate to="rapport" replace />} />
+            <Route path="rapport"                element={<RapportPage />} />
+            <Route path="doctors"                element={<DoctorsPage />} />
+            <Route path="doctors/edit/:id"       element={<DoctorsEditPage />} />  {/* ✅ relative */}
+            <Route path="doctors/new"            element={<DoctorAddPage />} />    {/* ✅ relative */}
+            <Route path="alertes"                element={<AlertesPage />} />
+            <Route path="alertes/edit/:id"       element={<AlertesaddEdit />} />   {/* ✅ relative */}
+            <Route path="alertes/new"            element={<AlertesAdd />} />       {/* ✅ relative */}
+            <Route path="changepassword"         element={<ChangePasswordPage />} />
+            <Route path="Dureedeconservation"    element={<Dureedeconservation />} />
           </Route>
 
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="/"  element={<Navigate to="/login" replace />} />
+          <Route path="*"  element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
     </ConfigProvider>

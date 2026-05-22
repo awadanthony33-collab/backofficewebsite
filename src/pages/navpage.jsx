@@ -17,7 +17,7 @@ import {
   ClockCircleOutlined ,
 // @ts-ignore
 } from '@ant-design/icons';
-import { Avatar, Dropdown } from '../../node_modules/antd/es/index';
+import { Avatar, Dropdown } from 'antd';
 
 const ROUTES  =
 {
@@ -88,7 +88,7 @@ return (
         <Layout className={`nav-main ${collapsed ? 'collapsed' : ''}`}>
         <Header className="nav-header">
           <div className="nav-header-left">
-            <img src="/logo.png" alt="Logo" className="nav-logo" />
+          <img src={`${process.env.PUBLIC_URL}/logo.png`} alt="Logo" className="nav-logo" />
             <span className="nav-header-title">Institut National de Pathologie</span>
           </div>
           <Dropdown menu={userMenu} placement="bottomRight" trigger={['click']}>

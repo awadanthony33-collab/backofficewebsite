@@ -6,7 +6,7 @@ import { Form, Input, Button, Checkbox, message } from 'antd';
 // @ts-ignore
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:54608/api';
+const BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
 const LoginPage = () => {
   const [form] = Form.useForm();

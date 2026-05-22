@@ -68,3 +68,12 @@ export const remove = async (endpoint, id) => {
   });
   if (!response.ok) throw new Error(`DELETE ${endpoint}/${id} failed`);
 };
+
+// ── DELETE — remove record ────────────────────────────────
+export const remove_report = async (endpoint) => {
+  const response = await fetch(`${BASE_URL}/${endpoint}`, {
+    method: 'DELETE',
+    headers: getHeaders(),
+  });
+  if (!response.ok) throw new Error(`DELETE ${endpoint} failed`);
+};
