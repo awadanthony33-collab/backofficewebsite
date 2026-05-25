@@ -43,11 +43,11 @@ function App() {
             <Route index                         element={<Navigate to="rapport" replace />} />
             <Route path="rapport"                element={<RapportPage />} />
             <Route path="doctors"                element={<DoctorsPage />} />
-            <Route path="doctors/edit/:id"       element={<DoctorsEditPage />} />  {/* ✅ relative */}
-            <Route path="doctors/new"            element={<DoctorAddPage />} />    {/* ✅ relative */}
+            <Route path="doctors/edit/:id"       element={<DoctorsEditPage />} />  
+            <Route path="doctors/new"            element={<DoctorAddPage />} />   
             <Route path="alertes"                element={<AlertesPage />} />
-            <Route path="alertes/edit/:id"       element={<AlertesaddEdit />} />   {/* ✅ relative */}
-            <Route path="alertes/new"            element={<AlertesAdd />} />       {/* ✅ relative */}
+            <Route path="alertes/edit/:id"       element={<AlertesaddEdit />} />  
+            <Route path="alertes/new"            element={<AlertesAdd />} />      
             <Route path="changepassword"         element={<ChangePasswordPage />} />
             <Route path="Dureedeconservation"    element={<Dureedeconservation />} />
           </Route>
