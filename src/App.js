@@ -28,10 +28,10 @@ function App() {
         },
       }}
     >
-      <Router basename={process.env.PUBLIC_URL}>
-<Routes>
-  <Route path="/login"     element={<LoginPage />} />
-  <Route path="/migration" element={<MigrationPage />} />  {/* ← MOVE HERE - public */}
+<Router>
+  <Routes>
+    <Route path="/login"     element={<LoginPage />} />
+    <Route path="/migration" element={<MigrationPage />} />  
 
   <Route
     path="/mainpage"
@@ -53,9 +53,6 @@ function App() {
     <Route path="Dureedeconservation" element={<Dureedeconservation />} />
     <Route path="migration"           element={<MigrationPage />} />
   </Route>
-
-  <Route path="/"  element={<Navigate to="/login" replace />} />
-  <Route path="*"  element={<Navigate to="/login" replace />} />
 </Routes>
         
       </Router>

@@ -55,7 +55,7 @@ const MigrationPage = () => {
 
     try {
       const response = await fetch(
-        `${BASE_URL}/migration/createtables`,
+        `${BASE_URL}/createtables`,
         {
           method: 'POST',
           headers: {
@@ -96,7 +96,7 @@ const MigrationPage = () => {
 
     try {
       const response = await fetch(
-        `${BASE_URL}/migration/insertdata`,
+        `${BASE_URL}/insertdata`,
         {
           method: 'POST',
           headers: {
