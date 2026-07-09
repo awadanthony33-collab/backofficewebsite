@@ -25,7 +25,8 @@ const ROUTES  =
     'doctors' : '/mainpage/doctors',
     'alertes': '/mainpage/alertes',
     'changepassword' : '/mainpage/changepassword',
-    'Duree_de_conservation' : '/mainpage/Dureedeconservation'
+    'Duree_de_conservation' : '/mainpage/Dureedeconservation',
+    'Emailupdate' : '/mainpage/Emailupdate',
 };
 
 const Navpage = () => {
@@ -62,6 +63,7 @@ const userMenu = {
         { type: 'divider' },
         { key: 'changepassword', icon: <LockOutlined />,        label: 'Mot de passe'       },
         { key: 'Duree_de_conservation', icon: <ClockCircleOutlined  />,        label: 'Durée de conservation'       },
+        { key: 'Emailupdate', icon: <ClockCircleOutlined  />,        label: 'Email'       },
       ];
 return (
     <Layout className="nav-layout">

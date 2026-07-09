@@ -193,7 +193,7 @@ const AlertesAdd = () => {
 
         const reader = new FileReader();
         reader.onload = ev => {
-          // ✅ Replace local path with base64 — fully self-contained
+
           img.setAttribute('src', ev.target.result);
           resolve();
         };
