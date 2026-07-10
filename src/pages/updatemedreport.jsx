@@ -1,5 +1,5 @@
-import { Card, Statistic, Row, Col, Button, List, Tag, message } from 'antd';
-import { useState } from 'react';
+import { Card, Statistic, Row, Col, List, Tag, message } from 'antd';
+import { useState, useEffect, useCallback ,useRef } from 'react';
 
 function ProcessingSummary() {
   const [summary, setSummary] = useState(null);
@@ -11,8 +11,8 @@ function ProcessingSummary() {
     month: '2-digit',
     year: 'numeric'
   });
-
-  const runProcessing = async () => {
+  const hasRun = useRef(false);
+  const runProcessing = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`${apiUrl}/Reports/process-upload-folder`);
@@ -25,20 +25,24 @@ function ProcessingSummary() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiUrl]);
+
 
   const totalCreated = summary?.results?.reduce((sum, r) => sum + (r.createdcount || 0), 0) || 0;
   const totalUpdated = summary?.results?.reduce((sum, r) => sum + (r.updatedcount || 0), 0) || 0;
   const totalEmailed = summary?.results?.reduce((sum, r) => sum + (r.emailsent?.length || 0), 0) || 0;
 
+useEffect(() => {
+  if (hasRun.current) return;
+
+  hasRun.current = true;
+  runProcessing();
+}, [runProcessing]);
+  
   return (
     <Card
       title={`Traitement des rapports médicaux — date: ${today}`}
-      extra={
-        <Button type="primary" loading={loading} onClick={runProcessing}>
-          Lancer le traitement
-        </Button>
-      }
+      loading={loading}
       style={{ marginBottom: 24 }}
     >
       {summary && (
