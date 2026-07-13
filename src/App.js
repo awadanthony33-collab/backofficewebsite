@@ -19,8 +19,7 @@ import MigrationPage       from './pages/Migrationpage';
 import UpdateMedReport     from './pages/updatemedreport';
 import DbAdminPage         from './pages/dbadminpage';
 import Emailupdate         from './pages/Emailupdate';
-
-
+import AdminRoute           from './pages/AdminRoute';
 function App() {
   return (
     <ConfigProvider
@@ -39,7 +38,7 @@ function App() {
     <Route path="/login"      element={<LoginPage />} />
     <Route path="/migration"  element={<MigrationPage />} />
     <Route path="/updatemedreps"  element={<UpdateMedReport />} />
-    <Route path="/dbadmin"     element={<DbAdminPage />} />
+  
     <Route
       path="/mainpage"
       element={
@@ -60,7 +59,16 @@ function App() {
       <Route path="Dureedeconservation" element={<Dureedeconservation />} />
       <Route path="migration"           element={<MigrationPage />} />
       <Route path="updatemedreps"       element={<UpdateMedReport />} />
-      <Route path="Emailupdate"             element={<Emailupdate />} />
+      <Route path="Emailupdate"         element={<Emailupdate />} />
+          ...
+    <Route
+        path="dbadmin"
+        element={
+            <AdminRoute>
+                <DbAdminPage />
+            </AdminRoute>
+        }
+    />
     </Route>
 
     <Route path="*" element={<Navigate to="/login" replace />} />

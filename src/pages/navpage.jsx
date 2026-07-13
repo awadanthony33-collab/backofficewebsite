@@ -27,6 +27,7 @@ const ROUTES  =
     'changepassword' : '/mainpage/changepassword',
     'Duree_de_conservation' : '/mainpage/Dureedeconservation',
     'Emailupdate' : '/mainpage/Emailupdate',
+    'dbadmin' : '/mainpage/dbadmin',
 };
 
 const Navpage = () => {
@@ -38,7 +39,7 @@ const Navpage = () => {
     ([, path]) => location.pathname.startsWith(path)
   )?.[0] || 'rapport'
 const username = sessionStorage.getItem('username') || 'Admin';
-
+const role = sessionStorage.getItem("role");
 const handleLogout = () => {
   sessionStorage.clear();
   navigate('/login');
@@ -60,10 +61,18 @@ const userMenu = {
         { key: 'rapport',         icon: <FileTextOutlined />,    label: 'Rapports'           },
         { key: 'doctors',         icon: <MedicineBoxOutlined />, label: 'Médecins'           },
         { key: 'alertes',         icon: <BellOutlined />,        label: 'Alertes nouvelles'  },
+        ...(role === "Admin"
+        ? [{
+            key: 'dbadmin',
+            icon: <UserOutlined />,
+            label: 'Database Admin',
+        }]
+        : []),
         { type: 'divider' },
         { key: 'changepassword', icon: <LockOutlined />,        label: 'Mot de passe'       },
         { key: 'Duree_de_conservation', icon: <ClockCircleOutlined  />,        label: 'Durée de conservation'       },
         { key: 'Emailupdate', icon: <ClockCircleOutlined  />,        label: 'Email'       },
+ 
       ];
 return (
     <Layout className="nav-layout">

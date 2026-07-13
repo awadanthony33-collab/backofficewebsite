@@ -36,7 +36,7 @@ const LoginPage = () => {
 
         sessionStorage.setItem('isLoggedIn', 'true');
         sessionStorage.setItem('username', data.users);
-
+        sessionStorage.setItem('role', data.role);
         message.success(`Welcome, ${data.users}!`);
         
         setTimeout(() => {
